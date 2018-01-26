@@ -1,7 +1,6 @@
-import pymysql.cursors
-
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
+from connection import connection
 
 class Item(Resource):
 
@@ -24,7 +23,6 @@ class Item(Resource):
 
     @classmethod
     def find_by_name(cls, name):
-        connection = pymysql.connect(host='localhost',user='root',password='root',unix_socket="/Applications/MAMP/tmp/mysql/mysql.sock",db='flask-rest-mysql',port=3306)
         cursor = connection.cursor()
 
         query = "SELECT * FROM items WHERE name=%s"
@@ -45,13 +43,13 @@ class Item(Resource):
         try:
             self.insert(item)
         except TypeError as e:
+            print(e)
             return {'message': e}, 500
 
         return item, 201
 
     @classmethod
     def insert(cls, item):
-        connection = pymysql.connect(host='localhost',user='root',password='root',unix_socket="/Applications/MAMP/tmp/mysql/mysql.sock",db='flask-rest-mysql',port=3306)
         cursor = connection.cursor()
 
         query = "INSERT INTO items VALUES (NULL, %s, %s)"
@@ -61,7 +59,6 @@ class Item(Resource):
     @jwt_required()
     def delete(self, name):
 
-        connection = pymysql.connect(host='localhost',user='root',password='root',unix_socket="/Applications/MAMP/tmp/mysql/mysql.sock",db='flask-rest-mysql',port=3306)
         cursor = connection.cursor()
 
         query = "DELETE FROM items WHERE name=%s"
@@ -93,7 +90,6 @@ class Item(Resource):
 
     @classmethod
     def update(cls, item):
-        connection = pymysql.connect(host='localhost',user='root',password='root',unix_socket="/Applications/MAMP/tmp/mysql/mysql.sock",db='flask-rest-mysql',port=3306)
         cursor = connection.cursor()
         query = "UPDATE items SET price=%s WHERE name=%s"
         cursor.execute(query, (item['price'],item['name']))
@@ -104,7 +100,6 @@ class ItemList(Resource):
 
     @jwt_required()
     def get(self):
-        connection = pymysql.connect(host='localhost',user='root',password='root',unix_socket="/Applications/MAMP/tmp/mysql/mysql.sock",db='flask-rest-mysql',port=3306)
         cursor = connection.cursor()
 
         query = "SELECT * FROM items"
@@ -116,6 +111,5 @@ class ItemList(Resource):
             items.append({'name': row[1], 'price': row[2]})
 
         connection.commit()
-        connection.close()
 
         return {"items": items}
