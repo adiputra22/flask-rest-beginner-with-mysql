@@ -1,6 +1,5 @@
-import sqlite3
+from connection import connection
 
-connection = sqlite3.connect('data.db')
 cursor = connection.cursor()
 
 create_table = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username text, password text)"
